@@ -1,31 +1,31 @@
 from pydantic import BaseModel
 from typing import Optional
-from datetime import datetime
+
+class MarcaBase(BaseModel):
+    nome: str
+    slug: str
+    logo: str
+    quantidade: int = 0
+
+class MarcaResponse(MarcaBase):
+    id: int
+
+    class Config:
+        from_attributes = True
 
 class CarroBase(BaseModel):
     nome: str
-    marca: str
-    modelo: str
-    ano_fabricacao: int
-    ano_modelo: int
-    tipo: str
-    descricao: str
-    cor: str
-    combustivel: str
-    cambio: str
-    motor: str
-    potencia: str
-    quilometragem: int
+    marcaId: int
+    ano: int
     preco: float
-    portas: int
-    placa: str
-    renavam: str
-    status: str = "Disponível"
+    km: int
+    transmissao: str
+    imagem: str
+    descricao: Optional[str] = None
 
 class CarroResponse(CarroBase):
     id: int
-    created_at: datetime
-    updated_at: Optional[datetime]
+    nomeMarca: Optional[str] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True

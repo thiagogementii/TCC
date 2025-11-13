@@ -1,5 +1,5 @@
-from sqlalchemy import Column, Integer, String, Numeric, DateTime
-from sqlalchemy.sql import func
+from sqlalchemy import Column, Integer, String, Numeric, ForeignKey
+from sqlalchemy.orm import relationship
 from app.core.database import Base
 
 class Carro(Base):
@@ -7,22 +7,13 @@ class Carro(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     nome = Column(String, nullable=False)
-    marca = Column(String, nullable=False)
-    modelo = Column(String, nullable=False)
-    ano_fabricacao = Column(Integer)
-    ano_modelo = Column(Integer)
-    tipo = Column(String)
+    marcaId = Column(Integer, ForeignKey("marcas.id"), nullable=False)
+    ano = Column(Integer, nullable=False)
+    preco = Column(Numeric(10, 2), nullable=False)
+    km = Column(Integer, nullable=False)
+    transmissao = Column(String, nullable=False)
+    imagem = Column(String, nullable=False)
     descricao = Column(String)
-    cor = Column(String)
-    combustivel = Column(String)
-    cambio = Column(String)
-    motor = Column(String)
-    potencia = Column(String)
-    quilometragem = Column(Integer)
-    preco = Column(Numeric(10, 2))
-    portas = Column(Integer)
-    placa = Column(String, unique=True)
-    renavam = Column(String, unique=True)
-    status = Column(String, default="Disponível")
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    # Relacionamento com marca
+    marca_rel = relationship("Marca", back_populates="carros")

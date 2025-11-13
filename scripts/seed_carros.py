@@ -1,4 +1,4 @@
-"""Seed script para inserir 20 carros na tabela `carros`.
+"""Seed script para inserir marcas e carros na base de dados.
 
 Observações:
 - Este arquivo NÃO executa inserções ao ser importado; rode-o diretamente:
@@ -6,11 +6,6 @@ Observações:
 - Revise `DATABASE_URL` em `.env` antes de executar para evitar inserir em um banco errado.
 """
 
-# Quando este script é executado diretamente (python scripts/seed_carros.py)
-# o import "app" pode falhar porque o diretório do projeto pode não estar
-# no sys.path. Aqui garantimos que o diretório raiz do projeto (pai de
-# `scripts/`) seja adicionado ao sys.path para que imports como
-# `from app...` funcionem.
 import sys
 from pathlib import Path
 
@@ -19,429 +14,236 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from decimal import Decimal
-from datetime import datetime
 from app.core.database import SessionLocal, engine, Base
+from app.models.marca_model import Marca
 from app.models.carro_model import Carro
 
 
+MARCAS = [
+    {
+        "nome": "Toyota",
+        "slug": "toyota",
+        "logo": "https://logo.clearbit.com/toyota.com",
+        "quantidade": 0
+    },
+    {
+        "nome": "Honda",
+        "slug": "honda",
+        "logo": "https://logo.clearbit.com/honda.com",
+        "quantidade": 0
+    },
+    {
+        "nome": "Volkswagen",
+        "slug": "volkswagen",
+        "logo": "https://logo.clearbit.com/vw.com",
+        "quantidade": 0
+    },
+    {
+        "nome": "Fiat",
+        "slug": "fiat",
+        "logo": "https://logo.clearbit.com/fiat.com",
+        "quantidade": 0
+    },
+    {
+        "nome": "Chevrolet",
+        "slug": "chevrolet",
+        "logo": "https://logo.clearbit.com/chevrolet.com",
+        "quantidade": 0
+    },
+    {
+        "nome": "Hyundai",
+        "slug": "hyundai",
+        "logo": "https://logo.clearbit.com/hyundai.com",
+        "quantidade": 0
+    },
+    {
+        "nome": "Nissan",
+        "slug": "nissan",
+        "logo": "https://logo.clearbit.com/nissan.com",
+        "quantidade": 0
+    },
+    {
+        "nome": "Jeep",
+        "slug": "jeep",
+        "logo": "https://logo.clearbit.com/jeep.com",
+        "quantidade": 0
+    },
+    {
+        "nome": "Renault",
+        "slug": "renault",
+        "logo": "https://logo.clearbit.com/renault.com",
+        "quantidade": 0
+    },
+    {
+        "nome": "Peugeot",
+        "slug": "peugeot",
+        "logo": "https://logo.clearbit.com/peugeot.com",
+        "quantidade": 0
+    },
+]
+
+# Carros com a estrutura simplificada
 CARROS = [
     {
-        "nome": "Corolla XEi",
-        "marca": "Toyota",
-        "modelo": "XEi",
-        "ano_fabricacao": 2018,
-        "ano_modelo": 2019,
-        "tipo": "Sedan",
-        "descricao": "Sedan confortável, bem conservado",
-        "cor": "Prata",
-        "combustivel": "Flex",
-        "cambio": "Automático",
-        "motor": "1.8",
-        "potencia": "139 hp",
-        "quilometragem": 45000,
-        "preco": Decimal("85000.00"),
-        "portas": 4,
-        "placa": "AAA1A01",
-        "renavam": "00000000001",
-        "status": "Disponível",
+        "nome": "Corolla Altis",
+        "marca_nome": "Toyota",
+        "ano": 2024,
+        "preco": Decimal("160000.00"),
+        "km": 8500,
+        "transmissao": "Automático",
+        "imagem": "https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=800&q=80",
+        "descricao": "Veículo zero km, com ar-condicionado digital, central multimídia com tela de 9 polegadas, sistema de som premium, câmera de ré, sensores de estacionamento, piloto automático adaptativo, faróis full LED, bancos em couro legítimo e pacote completo de assistências à condução. Estado impecável, ainda na garantia de fábrica.",
     },
     {
-        "nome": "Civic EX",
-        "marca": "Honda",
-        "modelo": "EX",
-        "ano_fabricacao": 2017,
-        "ano_modelo": 2018,
-        "tipo": "Sedan",
-        "descricao": "Único dono, interior em ótimo estado",
-        "cor": "Preto",
-        "combustivel": "Flex",
-        "cambio": "Automático",
-        "motor": "2.0",
-        "potencia": "155 hp",
-        "quilometragem": 60000,
-        "preco": Decimal("78000.00"),
-        "portas": 4,
-        "placa": "AAA1A02",
-        "renavam": "00000000002",
-        "status": "Disponível",
-    },
-    {
-        "nome": "Ka SE",
-        "marca": "Ford",
-        "modelo": "SE",
-        "ano_fabricacao": 2016,
-        "ano_modelo": 2016,
-        "tipo": "Hatchback",
-        "descricao": "Econômico e ágil para cidade",
-        "cor": "Branco",
-        "combustivel": "Flex",
-        "cambio": "Manual",
-        "motor": "1.0",
-        "potencia": "80 hp",
-        "quilometragem": 85000,
-        "preco": Decimal("35000.00"),
-        "portas": 4,
-        "placa": "AAA1A03",
-        "renavam": "00000000003",
-        "status": "Disponível",
-    },
-    {
-        "nome": "Onix LT",
-        "marca": "Chevrolet",
-        "modelo": "LT",
-        "ano_fabricacao": 2019,
-        "ano_modelo": 2019,
-        "tipo": "Hatchback",
-        "descricao": "Baixa quilometragem, completo",
-        "cor": "Vermelho",
-        "combustivel": "Flex",
-        "cambio": "Automático",
-        "motor": "1.4",
-        "potencia": "106 hp",
-        "quilometragem": 30000,
-        "preco": Decimal("62000.00"),
-        "portas": 4,
-        "placa": "AAA1A04",
-        "renavam": "00000000004",
-        "status": "Disponível",
-    },
-    {
-        "nome": "Golf GTI",
-        "marca": "Volkswagen",
-        "modelo": "GTI",
-        "ano_fabricacao": 2015,
-        "ano_modelo": 2015,
-        "tipo": "Hatchback",
-        "descricao": "Versão esportiva, motor potente",
-        "cor": "Azul",
-        "combustivel": "Gasolina",
-        "cambio": "Manual",
-        "motor": "2.0 Turbo",
-        "potencia": "220 hp",
-        "quilometragem": 90000,
-        "preco": Decimal("92000.00"),
-        "portas": 2,
-        "placa": "AAA1A05",
-        "renavam": "00000000005",
-        "status": "Disponível",
-    },
-    {
-        "nome": "X1 20i",
-        "marca": "BMW",
-        "modelo": "X1",
-        "ano_fabricacao": 2018,
-        "ano_modelo": 2019,
-        "tipo": "SUV",
-        "descricao": "SUV compacto premium",
-        "cor": "Cinza",
-        "combustivel": "Gasolina",
-        "cambio": "Automático",
-        "motor": "2.0",
-        "potencia": "192 hp",
-        "quilometragem": 55000,
-        "preco": Decimal("150000.00"),
-        "portas": 4,
-        "placa": "AAA1A06",
-        "renavam": "00000000006",
-        "status": "Disponível",
-    },
-    {
-        "nome": "C200",
-        "marca": "Mercedes",
-        "modelo": "C200",
-        "ano_fabricacao": 2017,
-        "ano_modelo": 2018,
-        "tipo": "Sedan",
-        "descricao": "Sedan executivo, muito confortável",
-        "cor": "Preto",
-        "combustivel": "Gasolina",
-        "cambio": "Automático",
-        "motor": "2.0",
-        "potencia": "184 hp",
-        "quilometragem": 70000,
+        "nome": "Civic Touring",
+        "marca_nome": "Honda",
+        "ano": 2023,
         "preco": Decimal("170000.00"),
-        "portas": 4,
-        "placa": "AAA1A07",
-        "renavam": "00000000007",
-        "status": "Disponível",
+        "km": 25000,
+        "transmissao": "Automático",
+        "imagem": "https://images.unsplash.com/photo-1590362891991-f776e747a588?w=800&q=80",
+        "descricao": "Seminovo em excelente estado, único dono. Equipado com motor turbo de alto desempenho, câmbio CVT, teto solar panorâmico, sistema Honda Sensing completo (controle de cruzeiro adaptativo, assistente de permanência em faixa), bancos em couro com aquecimento, retrovisores rebatíveis automaticamente, e sistema multimídia com Apple CarPlay e Android Auto. Manutenções em dia na concessionária.",
     },
     {
-        "nome": "A3 Sedan",
-        "marca": "Audi",
-        "modelo": "A3",
-        "ano_fabricacao": 2016,
-        "ano_modelo": 2016,
-        "tipo": "Sedan",
-        "descricao": "Boa dirigibilidade e acabamento",
-        "cor": "Branco",
-        "combustivel": "Gasolina",
-        "cambio": "Automático",
-        "motor": "1.8",
-        "potencia": "170 hp",
-        "quilometragem": 80000,
-        "preco": Decimal("98000.00"),
-        "portas": 4,
-        "placa": "AAA1A08",
-        "renavam": "00000000008",
-        "status": "Disponível",
+        "nome": "T-Cross Highline",
+        "marca_nome": "Volkswagen",
+        "ano": 2024,
+        "preco": Decimal("150000.00"),
+        "km": 12000,
+        "transmissao": "Automático",
+        "imagem": "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=800&q=80",
+        "descricao": "SUV compacto praticamente zero, com apenas um ano de uso. Possui teto solar elétrico, rodas de liga leve diamantadas, central multimídia VW Play de 10 polegadas, ar-condicionado automático dual zone, câmera 360 graus, sensores dianteiros e traseiros, faróis e lanternas full LED, bancos revestidos em material premium e porta-malas amplo. Revisões feitas na concessionária autorizada.",
     },
     {
-        "nome": "HB20 Comfort",
-        "marca": "Hyundai",
-        "modelo": "HB20",
-        "ano_fabricacao": 2020,
-        "ano_modelo": 2020,
-        "tipo": "Hatchback",
-        "descricao": "Novo, revisão em dia",
-        "cor": "Prata",
-        "combustivel": "Flex",
-        "cambio": "Manual",
-        "motor": "1.0",
-        "potencia": "80 hp",
-        "quilometragem": 15000,
-        "preco": Decimal("68000.00"),
-        "portas": 4,
-        "placa": "AAA1A09",
-        "renavam": "00000000009",
-        "status": "Disponível",
+        "nome": "Pulse Abarth",
+        "marca_nome": "Fiat",
+        "ano": 2024,
+        "preco": Decimal("135000.00"),
+        "km": 6800,
+        "transmissao": "Automático",
+        "imagem": "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&q=80",
+        "descricao": "Versão esportiva Abarth praticamente nova, com visual agressivo e alto desempenho. Equipado com rodas aro 18 exclusivas, suspensão esportiva rebaixada, bancos Sabelt com revestimento esportivo, câmbio CVT com modo manual, painel digital de 7 polegadas, central multimídia de 10.1 polegadas, som Beats, teto solar, e sistema ADAS completo. Perfeito estado de conservação.",
     },
     {
-        "nome": "Sentra SV",
-        "marca": "Nissan",
-        "modelo": "Sentra",
-        "ano_fabricacao": 2015,
-        "ano_modelo": 2015,
-        "tipo": "Sedan",
-        "descricao": "Ótima estabilidade e consumo",
-        "cor": "Azul",
-        "combustivel": "Flex",
-        "cambio": "Automático",
-        "motor": "2.0",
-        "potencia": "140 hp",
-        "quilometragem": 90000,
-        "preco": Decimal("42000.00"),
-        "portas": 4,
-        "placa": "AAA1A10",
-        "renavam": "00000000010",
-        "status": "Disponível",
+        "nome": "Onix Premier",
+        "marca_nome": "Chevrolet",
+        "ano": 2023,
+        "preco": Decimal("100000.00"),
+        "km": 18500,
+        "transmissao": "Automático",
+        "imagem": "https://images.unsplash.com/photo-1583267746897-c2b15c34ab18?w=800&q=80",
+        "descricao": "Hatch premium em ótimo estado, único dono com baixa quilometragem. Conta com motor turbo eficiente, ar-condicionado digital automático, central multimídia MyLink de 8 polegadas com conectividade wireless, câmera de ré com linhas dinâmicas, sensor de estacionamento traseiro, controle de cruzeiro, volante multifuncional revestido em couro, rodas de liga leve e acabamento interno sofisticado. Nunca bateu.",
     },
     {
-        "nome": "Sportage LX",
-        "marca": "Kia",
-        "modelo": "Sportage",
-        "ano_fabricacao": 2018,
-        "ano_modelo": 2018,
-        "tipo": "SUV",
-        "descricao": "Espaçoso e confortável",
-        "cor": "Branco",
-        "combustivel": "Flex",
-        "cambio": "Automático",
-        "motor": "2.0",
-        "potencia": "167 hp",
-        "quilometragem": 65000,
+        "nome": "Creta Platinum",
+        "marca_nome": "Hyundai",
+        "ano": 2024,
+        "preco": Decimal("145000.00"),
+        "km": 9200,
+        "transmissao": "Automático",
+        "imagem": "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800&q=80",
+        "descricao": "SUV top de linha quase zero, com todos os opcionais de série. Possui teto solar panorâmico, central multimídia Bluelink de 10.25 polegadas, painel digital de 10.25 polegadas, carregador wireless para smartphone, ar-condicionado digital dual zone, sistema de som Bose premium, SmartSense (pacote de segurança avançado), faróis e lanternas full LED, bancos em couro Nappa com ventilação e aquecimento. Estado de showroom.",
+    },
+    {
+        "nome": "Versa Exclusive",
+        "marca_nome": "Nissan",
+        "ano": 2023,
         "preco": Decimal("110000.00"),
-        "portas": 4,
-        "placa": "AAA1A11",
-        "renavam": "00000000011",
-        "status": "Disponível",
+        "km": 22000,
+        "transmissao": "Automático",
+        "imagem": "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=800&q=80",
+        "descricao": "Sedan compacto bem conservado com baixa quilometragem. Equipado com central multimídia de 8 polegadas integrada com Apple CarPlay e Android Auto, ar-condicionado automático, controle de estabilidade e tração, câmera de ré, sensores traseiros, direção elétrica progressiva, bancos em tecido premium com ajustes múltiplos. Interior espaçoso e confortável, ideal para família. Todas as revisões em dia.",
     },
     {
-        "nome": "Sandero Auth",
-        "marca": "Renault",
-        "modelo": "Sandero",
-        "ano_fabricacao": 2014,
-        "ano_modelo": 2014,
-        "tipo": "Hatchback",
-        "descricao": "Custo-benefício excelente",
-        "cor": "Cinza",
-        "combustivel": "Flex",
-        "cambio": "Manual",
-        "motor": "1.0",
-        "potencia": "75 hp",
-        "quilometragem": 120000,
-        "preco": Decimal("26000.00"),
-        "portas": 4,
-        "placa": "AAA1A12",
-        "renavam": "00000000012",
-        "status": "Disponível",
+        "nome": "Compass Limited",
+        "marca_nome": "Jeep",
+        "ano": 2024,
+        "preco": Decimal("200000.00"),
+        "km": 11500,
+        "transmissao": "Automático",
+        "imagem": "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800&q=80",
+        "descricao": "SUV médio robusto e sofisticado, praticamente novo. Versão turbodiesel com tração 4x4, equipada com bancos em couro premium com costuras contrastantes, teto solar panorâmico comando de voz, sistema Uconnect de última geração com tela de 10.1 polegadas, painel digital personalizável de 10.25 polegadas, carregamento wireless, ar tri-zone, faróis full LED adaptativos, rodas aro 19, e pacote completo de segurança ativa. Veículo impecável.",
     },
     {
-        "nome": "208 Active",
-        "marca": "Peugeot",
-        "modelo": "208",
-        "ano_fabricacao": 2019,
-        "ano_modelo": 2019,
-        "tipo": "Hatchback",
-        "descricao": "Compacto com bom acabamento",
-        "cor": "Vermelho",
-        "combustivel": "Flex",
-        "cambio": "Automático",
-        "motor": "1.6",
-        "potencia": "118 hp",
-        "quilometragem": 40000,
-        "preco": Decimal("54000.00"),
-        "portas": 4,
-        "placa": "AAA1A13",
-        "renavam": "00000000013",
-        "status": "Disponível",
+        "nome": "Kwid Zen",
+        "marca_nome": "Renault",
+        "ano": 2023,
+        "preco": Decimal("70000.00"),
+        "km": 28000,
+        "transmissao": "Manual",
+        "imagem": "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&q=80",
+        "descricao": "Compacto econômico em ótimo estado de conservação. Perfeito para uso urbano, conta com ar-condicionado, direção elétrica, vidros e travas elétricas, central multimídia Media Evolution com tela de 8 polegadas, conectividade com smartphone, computador de bordo, sensor de estacionamento traseiro, e design moderno com grade frontal cromada. Motor 1.0 extremamente econômico. Pintura sem defeitos, pneus em bom estado.",
     },
     {
-        "nome": "Toro Freedom",
-        "marca": "Fiat",
-        "modelo": "Toro",
-        "ano_fabricacao": 2020,
-        "ano_modelo": 2020,
-        "tipo": "Pickup",
-        "descricao": "Versátil para família e trabalho",
-        "cor": "Prata",
-        "combustivel": "Flex",
-        "cambio": "Automático",
-        "motor": "1.8",
-        "potencia": "139 hp",
-        "quilometragem": 35000,
-        "preco": Decimal("125000.00"),
-        "portas": 4,
-        "placa": "AAA1A14",
-        "renavam": "00000000014",
-        "status": "Disponível",
-    },
-    {
-        "nome": "Impreza 2.0",
-        "marca": "Subaru",
-        "modelo": "Impreza",
-        "ano_fabricacao": 2016,
-        "ano_modelo": 2016,
-        "tipo": "Hatchback",
-        "descricao": "Tração 4x4, robusto",
-        "cor": "Azul",
-        "combustivel": "Gasolina",
-        "cambio": "Manual",
-        "motor": "2.0",
-        "potencia": "150 hp",
-        "quilometragem": 110000,
-        "preco": Decimal("68000.00"),
-        "portas": 4,
-        "placa": "AAA1A15",
-        "renavam": "00000000015",
-        "status": "Disponível",
-    },
-    {
-        "nome": "Lancer HL",
-        "marca": "Mitsubishi",
-        "modelo": "Lancer",
-        "ano_fabricacao": 2013,
-        "ano_modelo": 2013,
-        "tipo": "Sedan",
-        "descricao": "Durável e confiável",
-        "cor": "Prata",
-        "combustivel": "Gasolina",
-        "cambio": "Manual",
-        "motor": "2.0",
-        "potencia": "140 hp",
-        "quilometragem": 140000,
-        "preco": Decimal("32000.00"),
-        "portas": 4,
-        "placa": "AAA1A16",
-        "renavam": "00000000016",
-        "status": "Disponível",
-    },
-    {
-        "nome": "Mazda 3",
-        "marca": "Mazda",
-        "modelo": "3",
-        "ano_fabricacao": 2018,
-        "ano_modelo": 2018,
-        "tipo": "Sedan",
-        "descricao": "Boa dirigibilidade e economia",
-        "cor": "Branco",
-        "combustivel": "Gasolina",
-        "cambio": "Automático",
-        "motor": "2.0",
-        "potencia": "155 hp",
-        "quilometragem": 50000,
-        "preco": Decimal("92000.00"),
-        "portas": 4,
-        "placa": "AAA1A17",
-        "renavam": "00000000017",
-        "status": "Disponível",
-    },
-    {
-        "nome": "NX 300h",
-        "marca": "Lexus",
-        "modelo": "NX",
-        "ano_fabricacao": 2019,
-        "ano_modelo": 2019,
-        "tipo": "SUV",
-        "descricao": "Híbrido premium, silencioso",
-        "cor": "Preto",
-        "combustivel": "Híbrido",
-        "cambio": "Automático",
-        "motor": "2.0",
-        "potencia": "194 hp",
-        "quilometragem": 40000,
-        "preco": Decimal("210000.00"),
-        "portas": 4,
-        "placa": "AAA1A18",
-        "renavam": "00000000018",
-        "status": "Disponível",
-    },
-    {
-        "nome": "V60",
-        "marca": "Volvo",
-        "modelo": "V60",
-        "ano_fabricacao": 2017,
-        "ano_modelo": 2017,
-        "tipo": "Station",
-        "descricao": "Seguro e espaçoso",
-        "cor": "Cinza",
-        "combustivel": "Diesel",
-        "cambio": "Automático",
-        "motor": "2.0",
-        "potencia": "190 hp",
-        "quilometragem": 85000,
-        "preco": Decimal("132000.00"),
-        "portas": 4,
-        "placa": "AAA1A19",
-        "renavam": "00000000019",
-        "status": "Disponível",
-    },
-    {
-        "nome": "Renegade Sport",
-        "marca": "Jeep",
-        "modelo": "Renegade",
-        "ano_fabricacao": 2018,
-        "ano_modelo": 2018,
-        "tipo": "SUV",
-        "descricao": "Robusto para uso urbano e estrada",
-        "cor": "Verde",
-        "combustivel": "Flex",
-        "cambio": "Automático",
-        "motor": "1.8",
-        "potencia": "130 hp",
-        "quilometragem": 72000,
-        "preco": Decimal("98000.00"),
-        "portas": 4,
-        "placa": "AAA1A20",
-        "renavam": "00000000020",
-        "status": "Disponível",
+        "nome": "208 Griffe",
+        "marca_nome": "Peugeot",
+        "ano": 2024,
+        "preco": Decimal("95000.00"),
+        "km": 7500,
+        "transmissao": "Automático",
+        "imagem": "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80",
+        "descricao": "Hatch premium com design diferenciado e tecnologia de ponta. Equipado com i-Cockpit 3D (painel digital tridimensional de 10 polegadas), central multimídia de 10 polegadas com navegação GPS, teto panorâmico em vidro, ar-condicionado automático digital, bancos com revestimento TEP (aspecto couro), rodas de liga leve diamantadas aro 17, faróis full LED com assinatura luminosa, e sistema de frenagem autônoma de emergência. Veículo seminovo em estado de zero.",
     },
 ]
 
 
 def run():
-    """Insere os carros no banco. Use com cuidado."""
-    # cria tabelas se necessário
+    """Insere marcas e carros no banco. Use com cuidado."""
+    # Debug: imprimir a DATABASE_URL
+    import os
+    print(f"DATABASE_URL: {os.getenv('DATABASE_URL')}")
+
+    # Cria tabelas se necessário
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
+
     try:
-        for c in CARROS:
-            carro = Carro(**c)
-            db.add(carro)
+        # Limpar tabelas existentes (opcional)
+        print("Limpando dados existentes...")
+        db.query(Carro).delete()
+        db.query(Marca).delete()
         db.commit()
-        print(f"Inseridos {len(CARROS)} carros com sucesso.")
+
+        # Inserir marcas
+        print("Inserindo marcas...")
+        marcas_dict = {}
+        for m in MARCAS:
+            marca = Marca(**m)
+            db.add(marca)
+            db.flush()  # Para obter o ID
+            marcas_dict[m["nome"]] = marca.id
+
+        db.commit()
+        print(f"✓ Inseridas {len(MARCAS)} marcas com sucesso.")
+
+        # Inserir carros
+        print("Inserindo carros...")
+        for c in CARROS:
+            marca_nome = c.pop("marca_nome")
+            carro_data = {
+                **c,
+                "marcaId": marcas_dict[marca_nome]
+            }
+            carro = Carro(**carro_data)
+            db.add(carro)
+
+        db.commit()
+
+        # Atualizar quantidade de carros por marca
+        print("Atualizando contagem de marcas...")
+        for marca_id in marcas_dict.values():
+            count = db.query(Carro).filter(Carro.marcaId == marca_id).count()
+            db.query(Marca).filter(Marca.id == marca_id).update({"quantidade": count})
+
+        db.commit()
+        print(f"✓ Inseridos {len(CARROS)} carros com sucesso.")
+        print("✓ Seed concluído!")
+
     except Exception as e:
         db.rollback()
-        print("Erro ao inserir dados:", e)
+        print("✗ Erro ao inserir dados:", e)
+        import traceback
+        traceback.print_exc()
     finally:
         db.close()
 
