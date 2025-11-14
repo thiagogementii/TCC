@@ -31,25 +31,7 @@ app.add_middleware(
     max_age=3600,
 )
 
-# Rota raiz para teste
-@app.get("/", tags=["Status"])
-def root():
-    return {
-        "message": "API Concessionária está rodando!",
-        "status": "online",
-        "version": "1.0.0",
-        "endpoints": {
-            "carros": "/carros",
-            "marcas": "/marcas",
-            "docs": "/docs",
-            "redoc": "/redoc"
-        }
-    }
 
-# Health check endpoint
-@app.get("/health", tags=["Status"])
-def health_check():
-    return {"status": "healthy"}
 
 # Inclui os routers
 app.include_router(carro_router.router)

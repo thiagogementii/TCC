@@ -4,7 +4,7 @@ from typing import Optional
 class MarcaBase(BaseModel):
     nome: str
     slug: str
-    logo: str
+    logo: Optional[str] = None
     quantidade: int = 0
 
 class MarcaResponse(MarcaBase):
@@ -20,7 +20,7 @@ class CarroBase(BaseModel):
     preco: float
     km: int
     transmissao: str
-    imagem: str
+    imagem: Optional[str] = None
     descricao: Optional[str] = None
 
 class CarroResponse(CarroBase):

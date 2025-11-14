@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS carros (
     preco NUMERIC(10, 2) NOT NULL,
     km INTEGER NOT NULL,
     transmissao VARCHAR NOT NULL,
-    imagem VARCHAR NOT NULL,
+    imagem VARCHAR,
     descricao TEXT
 );
 
