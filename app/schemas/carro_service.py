@@ -20,6 +20,7 @@ class CarroBase(BaseModel):
     preco: float
     km: int
     transmissao: str
+    tipo: str
     imagem: Optional[str] = None
     descricao: Optional[str] = None
 

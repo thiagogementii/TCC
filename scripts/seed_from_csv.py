@@ -30,7 +30,7 @@ def seed_from_csv():
 
     try:
         # Caminho do arquivo CSV
-        csv_path = Path(__file__).parent / "carros_30_sortidos.csv"
+        csv_path = Path(__file__).parent / "carros_com_tipo.csv"
 
         if not csv_path.exists():
             print(f"✗ Arquivo CSV não encontrado: {csv_path}")
@@ -39,6 +39,21 @@ def seed_from_csv():
         print("🚀 Iniciando seed do banco de dados...")
         print(f"📄 Lendo arquivo: {csv_path}")
 
+        # Mapeamento de marcaId para nome da marca
+        # Baseado nos IDs do CSV
+        marcas_map = {
+            1: 'Nissan',
+            2: 'Fiat',
+            3: 'Jeep',
+            4: 'Renault',
+            5: 'Volkswagen',
+            6: 'Peugeot',
+            7: 'Toyota',
+            8: 'Honda',
+            9: 'Chevrolet',
+            10: 'Hyundai'
+        }
+
         # Dicionário para armazenar marcas já criadas
         marcas_cache = {}
 
@@ -46,34 +61,37 @@ def seed_from_csv():
         marcas_inseridas = 0
         carros_inseridos = 0
 
+        # Criar/buscar todas as marcas primeiro
+        for marca_id, marca_nome in marcas_map.items():
+            marca = db.query(Marca).filter(Marca.id == marca_id).first()
+
+            if not marca:
+                # Criar nova marca com ID específico
+                marca = Marca(
+                    id=marca_id,
+                    nome=marca_nome,
+                    slug=criar_slug(marca_nome),
+                    logo=None,
+                    quantidade=0
+                )
+                db.add(marca)
+                db.flush()
+                marcas_inseridas += 1
+                print(f"  ✓ Marca criada: {marca_nome} (ID: {marca_id})")
+
+            marcas_cache[marca_id] = marca
+
         # Ler o CSV
         with open(csv_path, 'r', encoding='utf-8') as file:
             reader = csv.DictReader(file)
 
             for row in reader:
-                marca_nome = row['marca']
+                marca_id = int(row['marcaId'])
+                marca = marcas_cache.get(marca_id)
 
-                # Criar ou buscar a marca
-                if marca_nome not in marcas_cache:
-                    # Verificar se a marca já existe no banco
-                    marca = db.query(Marca).filter(Marca.nome == marca_nome).first()
-
-                    if not marca:
-                        # Criar nova marca
-                        marca = Marca(
-                            nome=marca_nome,
-                            slug=criar_slug(marca_nome),
-                            logo=None,  # Deixar vazio para preencher manualmente
-                            quantidade=0
-                        )
-                        db.add(marca)
-                        db.flush()  # Para obter o ID
-                        marcas_inseridas += 1
-                        print(f"  ✓ Marca criada: {marca_nome}")
-
-                    marcas_cache[marca_nome] = marca
-                else:
-                    marca = marcas_cache[marca_nome]
+                if not marca:
+                    print(f"  ⚠ Marca ID {marca_id} não encontrada, pulando carro {row['nome']}")
+                    continue
 
                 # Criar o carro
                 carro = Carro(
@@ -83,7 +101,8 @@ def seed_from_csv():
                     preco=Decimal(row['preco']),
                     km=int(row['km']),
                     transmissao=row['transmissao'],
-                    imagem=None,  # Deixar vazio para preencher manualmente
+                    tipo=row['tipo'],
+                    imagem=row['imagem'],
                     descricao=row['descricao']
                 )
                 db.add(carro)
@@ -100,7 +119,6 @@ def seed_from_csv():
         print(f"📊 Marcas inseridas: {marcas_inseridas}")
         print(f"🚗 Carros inseridos: {carros_inseridos}")
         print("="*50)
-        print("\n💡 Dica: As imagens estão vazias. Preencha-as manualmente no banco de dados.")
 
     except Exception as e:
         db.rollback()

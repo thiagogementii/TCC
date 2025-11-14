@@ -12,6 +12,7 @@ class Carro(Base):
     preco = Column(Numeric(10, 2), nullable=False)
     km = Column(Integer, nullable=False)
     transmissao = Column(String, nullable=False)
+    tipo = Column(String, nullable=False)
     imagem = Column(String, nullable=True)
     descricao = Column(String)
 
